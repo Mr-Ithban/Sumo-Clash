@@ -444,6 +444,7 @@ public sealed class SumoClashPrototype : MonoBehaviour
             int controlMode = roundIndex >= 1 ? 1 : 3;
             float movementDamping = roundIndex == 0 ? 1.6f : 0.42f;
             players[i].Controller.SetRoundControlMode(controlMode, roundIndex >= 1 ? 55f : 0f, movementDamping);
+            players[i].Controller.SetTimedBoostRecoveryDuration(!playAgainstComputer && roundIndex >= 1 ? 0f : 2f);
             float movement = 1f;
             float dash = 1f;
             float impact = 1f;
@@ -992,14 +993,17 @@ public sealed class SumoClashPrototype : MonoBehaviour
         DrawInstructionRow(new Rect(cx - 375f, panelTop + 116f, 750f, 86f), new Color(0.34f, 0.82f, 1f),
             "ROUND 1  /  OPEN DOHYO", "Player 1 moves with WASD; player 2 uses arrow keys. Hold Q / Right Ctrl, then release to boost.");
         string roundTwoKeys = playAgainstComputer
-            ? "Move keys are off. Wrestlers spin automatically; use Q / E to boost and brace."
-            : "Move keys are off. P1: Q boost / A brace. P2: P boost / L brace.";
+            ? "Move keys are off. Wrestlers spin automatically; use Q / E. CPU matches keep the 2-second boost recovery."
+            : "Move keys are off. P1: Q boost / A brace. P2: P boost / L brace. No recovery pause in rounds 2–3.";
         DrawInstructionRow(new Rect(cx - 375f, panelTop + 212f, 750f, 86f), new Color(1f, 0.56f, 0.30f),
             "ROUNDS 2 + 3  /  SPINNING DUELS", roundTwoKeys);
         DrawInstructionRow(new Rect(cx - 375f, panelTop + 308f, 750f, 86f), new Color(0.42f, 0.91f, 0.70f),
             "ROUND 3  /  BARRICADE DUEL", "Same spin and boost rules, with four fixed barriers. Use them for cover and find a route around.");
+        string boostAndRingOut = playAgainstComputer
+            ? "Boost lasts up to 2 seconds, then recovers for 2 seconds. A round ends when the whole wrestler clears the ring."
+            : "Round 1 boost recovers for 2 seconds; rounds 2–3 have no recovery pause. A round ends when the whole wrestler clears the ring.";
         DrawInstructionRow(new Rect(cx - 375f, panelTop + 404f, 750f, 86f), new Color(0.95f, 0.77f, 0.32f),
-            "BOOST + RING OUT", "Boost lasts up to 2 seconds, then recovers for 2 seconds. A round ends when the whole wrestler clears the ring.");
+            "BOOST + RING OUT", boostAndRingOut);
         if (GUI.Button(new Rect(cx - 130f, panelTop + 555f, 260f, 58f), "BACK", primaryButtonStyle)) gameState = GameState.MainMenu;
     }
 
@@ -1036,7 +1040,7 @@ public sealed class SumoClashPrototype : MonoBehaviour
         DrawChargeMeter(new Rect(width - 304f, 68f, 260f, 16f), players[1].Controller.ChargeAmount, playerColours[1]);
         string level = roundIndex == 0 ? "OPEN RING • STANDARD MOVEMENT" : roundIndex == 1 ? "SPINNING SUMOS • CHARGE TO DASH TOWARD YOUR HEAD" : "SPINNING DUEL • FOUR FIXED BOUNCE BARRICADES";
         string chargeRule = roundIndex >= 1 && !playAgainstComputer
-            ? "P1: Q BOOST / A BRACE   •   P2: P BOOST / L BRACE"
+            ? "P1: Q BOOST / A BRACE   •   P2: P BOOST / L BRACE   •   NO RECOVERY"
             : roundIndex >= 1 ? "BOOST MAX 2S • 2S COOLDOWN" : "Q / CTRL CHARGE";
         GUI.Label(new Rect(width * 0.5f - 430f, height - 43f, 860f, 28f), $"{level}   •   {chargeRule}   •   ESC MENU", small);
     }

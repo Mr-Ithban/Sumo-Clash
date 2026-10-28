@@ -26,6 +26,7 @@ public sealed class PlayerController : MonoBehaviour
     private float chargeAmount;
     private float dashRemaining;
     private float chargeCooldownRemaining;
+    private float timedBoostRecoveryDuration = 2f;
     private float dashStrength;
     private Vector2 dashDirection = Vector2.right;
     private bool hitDuringDash;
@@ -164,6 +165,11 @@ public sealed class PlayerController : MonoBehaviour
         dashDuration = mode == 1 || mode == 3 ? 2f : 0.28f;
     }
 
+    public void SetTimedBoostRecoveryDuration(float duration)
+    {
+        timedBoostRecoveryDuration = Mathf.Max(0f, duration);
+    }
+
     public void SetMovementEnabled(bool enabled)
     {
         movementEnabled = enabled;
@@ -254,7 +260,7 @@ public sealed class PlayerController : MonoBehaviour
             body.linearVelocity = dashDirection * boostSpeed * roundDashMultiplier;
             dashStrength = Mathf.Lerp(3.5f, 8f, chargeStrength) * roundDashMultiplier * roundImpactMultiplier;
             dashRemaining = dashDuration;
-            chargeCooldownRemaining = timedBoostRound ? dashDuration + 2f : 1.6f;
+            chargeCooldownRemaining = timedBoostRound ? dashDuration + timedBoostRecoveryDuration : 1.6f;
             chargeAmount = 0f;
             hitDuringDash = false;
             EmitImpactBurst(5);
